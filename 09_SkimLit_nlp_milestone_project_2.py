@@ -55,7 +55,7 @@ def split_chars(text):
 
 
 # region Preprocess data
-data_dir = "pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
+data_dir = "pubmed-rct-master/PubMed_200k_RCT_numbers_replaced_with_at_sign/"
 
 train_samples = preprocess_text_with_line_numbers(data_dir + "train.txt")
 val_samples = preprocess_text_with_line_numbers(data_dir + "dev.txt")
@@ -115,9 +115,9 @@ token_embed = Embedding(input_dim=len(rct_20k_text_vocab),
                         mask_zero=True,
                         name="token_embedding")
 
-train_dataset = tf.data.Dataset.from_tensor_slices(train_sentences, train_labels_one_hot).batch(32).prefetch(tf.data.AUTOTUNE)
-valid_dataset = tf.data.Dataset.from_tensor_slices(val_sentences, val_labels_one_hot).batch(32).prefetch(tf.data.AUTOTUNE)
-test_dataset = tf.data.Dataset.from_tensor_slices(test_sentences, test_labels_one_hot).batch(32).prefetch(tf.data.AUTOTUNE)
+train_dataset = tf.data.Dataset.from_tensor_slices((train_sentences, train_labels_one_hot)).batch(32).prefetch(tf.data.AUTOTUNE)
+valid_dataset = tf.data.Dataset.from_tensor_slices((val_sentences, val_labels_one_hot)).batch(32).prefetch(tf.data.AUTOTUNE)
+test_dataset = tf.data.Dataset.from_tensor_slices((test_sentences, test_labels_one_hot)).batch(32).prefetch(tf.data.AUTOTUNE)
 # endregion
 
 # region Model 1: Conv1D with token embeddings
@@ -261,7 +261,7 @@ model_4.fit(train_char_token_dataset,
             validation_data=val_char_token_dataset,
             validation_steps=int(0.1 * len(val_char_token_dataset)))
 
-model_4_pred_probs = model_4.predict(valid_dataset)
+model_4_pred_probs = model_4.predict(val_char_token_dataset)
 model_4_preds = tf.argmax(model_4_pred_probs, axis=1)
 # endregion
 
@@ -343,6 +343,6 @@ model_5.fit(train_pos_char_token_dataset,
             validation_data=val_pos_char_token_dataset,
             validation_steps=int(0.1 * len(val_pos_char_token_dataset)))
 
-model_4_pred_probs = model_4.predict(valid_dataset)
-model_4_preds = tf.argmax(model_4_pred_probs, axis=1)
+model_5_pred_probs = model_5.predict(val_pos_char_token_dataset)
+model_5_preds = tf.argmax(model_5_pred_probs, axis=1)
 # endregion
